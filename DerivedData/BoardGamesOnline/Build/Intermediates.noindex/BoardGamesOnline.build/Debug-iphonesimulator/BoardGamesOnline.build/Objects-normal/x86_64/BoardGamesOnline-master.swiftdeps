@@ -1,0 +1,8 @@
+version: "Apple Swift version 4.0.3 (swiftlang-900.0.74.1 clang-900.0.39.2)"
+options: "710bc0fe8cbb3554aef26169fc434f8f"
+build_time: [1524230160, 897393000]
+inputs:
+  "/Users/mrx/Xcode/BoardGamesOnline/BoardGamesOnline/ViewController.swift": [1524230160, 0]
+  "/Users/mrx/Xcode/BoardGamesOnline/BoardGamesOnline/AppDelegate.swift": [1523961391, 0]
+  "/Users/mrx/Xcode/BoardGamesOnline/BoardGamesOnline/Connect4.swift": [1524228712, 0]
+  "/Users/mrx/Xcode/BoardGamesOnline/BoardGamesOnline/Game.swift": [1524228712, 0]

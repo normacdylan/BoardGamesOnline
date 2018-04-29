@@ -1,0 +1,22 @@
+{
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "BE180F17B20B77BA80C252FB56AAFBFCAF09B39F" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "756D75B9-C771-481B-B5D0-6C55D3409299",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "BE180F17B20B77BA80C252FB56AAFBFCAF09B39F" : ".."
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "BoardGamesOnline",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "BoardGamesOnline.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/normacdylan\/Godot_Break_Out.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BE180F17B20B77BA80C252FB56AAFBFCAF09B39F"
+    }
+  ]
+}
