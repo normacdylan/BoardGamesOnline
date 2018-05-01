@@ -1,45 +1,43 @@
 //
-//  ViewController.swift
+//  GameController.swift
 //  BoardGamesOnline
 //
-//  Created by August Posner on 2018-04-17.
+//  Created by August Posner on 2018-04-29.
 //  Copyright © 2018 August Posner. All rights reserved.
 //
 
 import UIKit
 import Firebase
 
-class ViewController: UIViewController {
-    
+class GameController: UIViewController {
+
     var gameView: GameDrawer?
-    var game: Game?
-    
-    var turn = Player.Player1
+    var game: String?
+    var table: String?
+    var players: [String]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         gameView = getGameView()
         self.view.addSubview(gameView!)
         
-        game = Connect4Game(width: Double(gameView!.bounds.width), height: Double(gameView!.bounds.height))
-        gameView!.game = game
+        guard let gameName = game else {return}
+        guard let tableName = table  else {return}
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tap(_:)))
-        self.gameView!.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc func tap(_ sender: UITapGestureRecognizer) {
-        let point = sender.location(in: gameView!)
-        print("tapped x:\(point.x) y:\(point.y)")
-        game!.onTouch(x: Double(point.x), y: Double(point.y))
-        gameView!.setNeedsDisplay()
+        gameView!.game = getGameFromName(gameName: gameName, width: Double(gameView!.bounds.width), height: Double(gameView!.bounds.height))
+        
+        getPlayersAtTable(game: gameName, table: tableName) { result in
+            self.players = result
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-
+    
     func getGameView() -> GameDrawer {
         let screenWidth = UIScreen.main.bounds.width
         let screenHeight = UIScreen.main.bounds.height
@@ -50,6 +48,5 @@ class ViewController: UIViewController {
         
         return gameView
     }
+
 }
-
-

@@ -80,7 +80,7 @@
             <objects>
                 <collectionViewController id="eNA-JQ-Ial" customClass="GameLobbyController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="6vt-Dy-x1J">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="crU-B6-BbY">
@@ -90,7 +90,7 @@
                             <inset key="sectionInset" minX="20" minY="20" maxX="20" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
-                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="k3O-e6-xHU" customClass="TableCell" customModule="BoardGamesOnline" customModuleProvider="target">
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" misplaced="YES" reuseIdentifier="Cell" id="k3O-e6-xHU" customClass="TableCell" customModule="BoardGamesOnline" customModuleProvider="target">
                                 <rect key="frame" x="20" y="20" width="150" height="150"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
@@ -129,7 +129,18 @@
                             <outlet property="delegate" destination="eNA-JQ-Ial" id="HVF-Xt-LHe"/>
                         </connections>
                     </collectionView>
-                    <toolbarItems/>
+                    <toolbarItems>
+                        <barButtonItem title="Create Table" width="199.5" id="08J-Sx-Yds">
+                            <connections>
+                                <action selector="pressedCreateTable:" destination="eNA-JQ-Ial" id="hHe-ng-X4a"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem title="Leave Table" width="171" id="VMP-Qf-XW3">
+                            <connections>
+                                <action selector="pressedLeaveTable:" destination="eNA-JQ-Ial" id="yhM-Nu-q1L"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Title" id="AkN-cL-4Hx">
                         <barButtonItem key="rightBarButtonItem" title="Log Out" id="nhv-Vq-pMo">
                             <connections>
@@ -137,15 +148,20 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <connections>
+                        <outlet property="createTableButton" destination="08J-Sx-Yds" id="h0E-M6-DMf"/>
+                        <outlet property="leaveTableButton" destination="VMP-Qf-XW3" id="AK8-UE-Zqm"/>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xck-tq-0qU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1832.8" y="26.53673163418291"/>
+            <point key="canvasLocation" x="1830" y="26"/>
         </scene>
-        <!--View Controller-->
+        <!--Game Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Game" id="BYZ-38-t0r" customClass="GameController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -155,14 +171,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2598" y="26"/>
+            <point key="canvasLocation" x="1049" y="781"/>
         </scene>
         <!--Games-->
         <scene sceneID="kFv-ZU-vhK">
             <objects>
                 <collectionViewController title="Games" id="Mrn-eJ-cyq" customClass="LobbyController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="4Gc-SE-86M">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="eEu-Ju-brO">
@@ -233,16 +249,20 @@
         <!--Log Out-->
         <scene sceneID="Xhf-M3-bD8">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="fS4-Db-hpv" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="fS4-Db-hpv" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Log Out" id="tEK-D3-LqN"/>
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="92y-Fw-E1S">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="ddl-KZ-Hvl">
+                        <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="Mrn-eJ-cyq" kind="relationship" relationship="rootViewController" id="6O3-u0-TTr"/>
                     </connections>

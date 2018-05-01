@@ -31,6 +31,10 @@ class LobbyController: UICollectionViewController {
             }
         }
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+      //  removeViewsObservers()
+    }
  
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
