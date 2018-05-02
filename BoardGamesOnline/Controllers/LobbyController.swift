@@ -18,6 +18,7 @@ class LobbyController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Leave tables?
     }
     
     override func viewWillAppear(_ animated: Bool) {

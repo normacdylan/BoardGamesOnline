@@ -70,12 +70,16 @@ class Board {
     }
     
     func isFull() -> Bool {
-      //  return board[0].filter{$0 == nil}.count > 0
-        return board[0].contains(nil)
+        return board[0].filter{$0 == nil}.count > 0
+      //  return board[0].contains(nil)
     }
     
     private func withinBoard(_ row: Int = 0, _ column: Int = 0) -> Bool {
         return row < rows && row > -1 && column < columns && column > -1
+    }
+    
+    func canPlaceCoin(column: Int) -> Bool {
+        return getOpenSlot(column: column) != nil
     }
     
     func placeCoin(column: Int, player: Player) -> Bool {
@@ -141,6 +145,8 @@ extension Board {
 class Connect4Game: Game {
     var width: Double
     var height: Double
+    var playing = false
+    var delegate: GameDelegate?
     
     let topMargin: Double
     let coinRadius: Double
@@ -210,22 +216,42 @@ class Connect4Game: Game {
         }
     }
     
-    func play() {
-      /*  var turn = Player.Player1
+    // send column istället?
+    func send(message: Int) {
+        delegate?.messageSent(message: message)
+    }
+    
+    // Lägg mynt i column om möjligt
+    func receive(message: Int) {
+        if board.canPlaceCoin(column: message) {
+            if board.placeCoin(column: message, player: turn) {
+                print("coin placed at column: \(message)")
+                turn = players.filter{$0 != turn}[0]
+            }
+        }
+    }
+    
+    func isOver() {
+        if let _ = board.getWinner() {
+            delegate?.gameOver()
+            return
+        }
         
-        while board.getWinner() == nil && !board.isFull() {
-            
-        } */
+        if board.isFull() {
+            delegate?.gameOver()
+            return
+        }
     }
     
     // Flera olika typer av touch för att flytta och släppa mynt. UITouchGesture?
     func onTouch(x: Double, y: Double) {
         if y < topMargin {
             for col in 0..<board.columns {
-                print("column \(col), x-value: \(getCoinCoordinates(0,col).x)")
+             //   print("column \(col), x-value: \(getCoinCoordinates(0,col).x)")
                 if abs(x - getCoinCoordinates(0, col).x) < coinRadius {
-                    if board.placeCoin(column: col, player: turn) {
-                        turn = players.filter{$0 != turn}[0]
+                    if board.canPlaceCoin(column: col) {
+                     //   turn = players.filter{$0 != turn}[0]
+                        send(message: col)
                     }
                 }
             }

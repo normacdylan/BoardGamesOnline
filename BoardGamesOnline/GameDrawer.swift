@@ -10,8 +10,7 @@ import Foundation
 import UIKit
 
 class GameDrawer: UIView {
-    
-    var game: Game?
+   var game: Game?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -22,6 +21,10 @@ class GameDrawer: UIView {
         super.init(coder: aDecoder)
     }
     
+    func startGame() {
+        guard var currentGame = game else {return}
+        currentGame.playing = true
+    }
     
     override func draw(_ rect: CGRect) {
         if let game = game {
@@ -32,7 +35,6 @@ class GameDrawer: UIView {
     }
     
     // byta ut mot uitouch istället?
-    
     private func addGestureRecognizers() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.touch(_:)))
         self.addGestureRecognizer(tapGesture)
@@ -45,7 +47,7 @@ class GameDrawer: UIView {
     
     @objc func touch(_ sender: UIGestureRecognizer) {
         let point = sender.location(in: self)
-        print("tapped x:\(point.x) y:\(point.y)")
+     //   print("tapped x:\(point.x) y:\(point.y)")
         // lägg till sender som argument i ontouch
         game!.onTouch(x: Double(point.x), y: Double(point.y))
         setNeedsDisplay()

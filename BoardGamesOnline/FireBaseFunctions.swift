@@ -1,8 +1,8 @@
 //
-//  FirebaseConstants.swift
+//  FireBaseFunctions.swift
 //  BoardGamesOnline
 //
-//  Created by August Posner on 2018-04-26.
+//  Created by August Posner on 2018-05-02.
 //  Copyright © 2018 August Posner. All rights reserved.
 //
 
@@ -30,7 +30,8 @@ func amountOfPlayers(game: String, completed: @escaping (Int) -> ()) {
         var result = 0
         for child in snapshot.children {
             let table = child as! DataSnapshot
-            result += Int(table.childrenCount)
+            let players = table.children.map{$0 as! DataSnapshot}.filter{$0.key != "LatestMove" && $0.key != "Turn"}.count
+            result += players
         }
         completed(result)
     })
@@ -45,7 +46,9 @@ func getTables(game: String, completed: @escaping ([(key: String, players: [Stri
             var players: [String] = []
             for player in table.children {
                 let user = player as! DataSnapshot
-                players.append(user.value! as! String)
+                if user.key != "LatestMove" && user.key != "Turn" {
+                    players.append(user.value! as! String)
+                }
             }
             result.append((id, players))
         }
@@ -53,13 +56,31 @@ func getTables(game: String, completed: @escaping ([(key: String, players: [Stri
     })
 }
 
-func getPlayersAtTable(game: String, table: String, completed: @escaping ([String]) -> ()) {
+func getPlayersAtTable(game: String, table: String, completed: @escaping ([(String, String)]) -> ()) {
     Ref.child(game).child(table).observe(.value, with: { snapshot in
-        var result: [String] = []
+        var result: [(String, String)] = []
         for child in snapshot.children {
             let user = child as! DataSnapshot
-            let name = user.value! as! String
-            result.append(name)
+            let key = user.key
+            if key != "LatestMove" && key != "Turn" {
+                let name = user.value! as! String
+                result.append((key,name))
+            }
+        }
+        completed(result)
+    })
+}
+
+func getPlayersAtTableOnce(game: String, table: String, completed: @escaping ([(String, String)]) -> ()) {
+    Ref.child(game).child(table).observeSingleEvent(of: .value, with: { snapshot in
+        var result: [(String, String)] = []
+        for child in snapshot.children {
+            let user = child as! DataSnapshot
+            let key = user.key
+            if key != "LatestMove" && key != "Turn" {
+                let name = user.value! as! String
+                result.append((key,name))
+            }
         }
         completed(result)
     })
@@ -76,6 +97,7 @@ func addTable(game: String) {
     if let user = Auth.auth().currentUser {
         autoKey.child(user.uid).setValue(user.displayName)
         Ref.child(user.uid).setValue(autoKey.key)
+        autoKey.child("LatestMove").setValue(-1)
     }
 }
 
@@ -91,6 +113,37 @@ func leaveTable(game: String, table: String) {
     if let user = Auth.auth().currentUser {
         Ref.child(game).child(table).child(user.uid).removeValue()
         Ref.child(user.uid).removeValue()
+        getPlayersAtTableOnce(game: game, table: table) { result in
+            if result.count == 0 {
+                Ref.child(game).child(table).removeValue()
+            }
+        }
+    }
+}
+
+func makeMove(game: String, table: String, move: Int) {
+    Ref.child(game).child(table).child("LatestMove").setValue(move)
+}
+
+// Kolla om child latestmove finns istället!
+func moveMade(game: String, table: String, completed: @escaping (Int) -> ()) {
+    Ref.child(game).child(table).child("LatestMove").observe(.value, with: { snapshot in
+        let move = snapshot.value! as! Int
+        completed(move)
+    })
+}
+
+func setPlayerTurn(game: String, table: String, playerId: String) {
+    Ref.child(game).child(table).child("Turn").setValue(playerId)
+    print("Turn value changed to \(playerId)")
+}
+
+func isPlayersTurn(game: String, table: String, completed: @escaping (Bool) -> ()) {
+    if let userId = Auth.auth().currentUser?.uid {
+        Ref.child(game).child(table).child("Turn").observeSingleEvent(of: .value, with: { snapshot in
+            let turnId = snapshot.value as! String
+            completed(turnId == userId)
+        })
     }
 }
 
@@ -123,10 +176,10 @@ func removeViewsObservers() {
         }
     })
     /*
-    // getUserSeat
-    if let userId = Auth.auth().currentUser?.uid {
-        Ref.child(userId).removeAllObservers()
-    } */
+     // getUserSeat
+     if let userId = Auth.auth().currentUser?.uid {
+     Ref.child(userId).removeAllObservers()
+     } */
 }
 
 func removeChildrensObservers(parent: DatabaseReference) {
@@ -139,16 +192,4 @@ func removeChildrensObservers(parent: DatabaseReference) {
 }
 
 // funktion som hämtar alla users och vilka bord de sitter på?
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -15,6 +15,7 @@ class GameLobbyController: UICollectionViewController {
 
     var game: String?
     var tables: [(String, [String])] = []
+    var goingToGame = false
     
     @IBOutlet weak var createTableButton: UIBarButtonItem!
     @IBOutlet weak var leaveTableButton: UIBarButtonItem!
@@ -25,8 +26,19 @@ class GameLobbyController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         setupView()
-      
-       // funktion som observerar när users bord blir fullt
+    }
+    
+    func checkIfTableIsFull(table: String) {
+        guard let gameName = game else {return}
+        getPlayersAtTable(game: gameName, table: table) { result in
+            if result.count > 1 {
+                let vc = self.storyboard?.instantiateViewController(withIdentifier: "Game") as! GameController
+                vc.game = self.game
+                vc.table = table
+                self.goingToGame = true
+                self.present(vc, animated: true, completion: nil)
+            }
+        }
     }
     
     func setupView() {
@@ -48,13 +60,14 @@ class GameLobbyController: UICollectionViewController {
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-        getUserSeat() { result in
-            guard let name = self.game else {return}
-            guard let seat = result else {return}
-            
-            leaveTable(game: name, table: seat)
+        if !goingToGame {
+            getUserSeat() { result in
+                guard let name = self.game else {return}
+                guard let seat = result else {return}
+                
+                leaveTable(game: name, table: seat)
+            }
         }
-        
     //    removeViewsObservers()
     }
 
@@ -77,6 +90,10 @@ class GameLobbyController: UICollectionViewController {
             if result == nil {
                 addTable(game: self.game!)
                 self.setupView()
+                getUserSeat() { seat in
+                    print("seat")
+                    self.checkIfTableIsFull(table: seat!)
+                }
             }
         }
     }
@@ -94,14 +111,16 @@ class GameLobbyController: UICollectionViewController {
             if result == nil {
                 let tableKey = self.tables[indexPath.row].0
                 let players = self.tables[indexPath.row].1
-                print("Players at didSelect: \(players.count)")
+                
                 if players.count < 2 {
                     guard let name = self.game else {return}
                     joinTable(game: name, table: tableKey)
                     self.setupView()
+                    
                     let vc = self.storyboard?.instantiateViewController(withIdentifier: "Game") as! GameController
                     vc.game = self.game
                     vc.table = tableKey
+                    self.goingToGame = true
                     self.present(vc, animated: true, completion: nil)
                 }
             }
