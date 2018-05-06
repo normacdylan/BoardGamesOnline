@@ -15,20 +15,35 @@ class GameController: UIViewController, GameDelegate {
     var table: String?
     var players: [(String, String)]?
     
+    @IBOutlet weak var eventLabel: UILabel!
+    @IBOutlet weak var infoLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        self.navigationController?.setToolbarHidden(true, animated: true)
+        
         gameView = getGameView()
         self.view.addSubview(gameView!)
         
-        guard let gameName = game else {return}
-        guard let tableName = table  else {return}
+        guard let gameName = game else {
+            print("no game found")
+            shutDown()
+            return
+        }
+        guard let tableName = table  else {
+            print("no table found")
+            shutDown()
+            return
+        }
         
-        title = gameName
         gameView!.game = getGameFromName(gameName: gameName, width: Double(gameView!.bounds.width), height: Double(gameView!.bounds.height))
         gameView!.game!.delegate = self
+        
+        infoLabel.text = gameView!.game!.getInfoText()
         
         getPlayersAtTableOnce(game: gameName, table: tableName) { result in
             self.players = result
@@ -36,16 +51,43 @@ class GameController: UIViewController, GameDelegate {
                 setPlayerTurn(game: gameName, table: tableName, playerId: playerList[0].0)
                 print("initiated turn")
                 self.gameView!.startGame()
+                if let user = Auth.auth().currentUser {
+                    let opponent = playerList.filter{$0.0 != user.uid}[0].1
+                    isPlayersTurn(game: gameName, table: tableName, completed: { isTurn in
+                        self.eventLabel.text = isTurn ? "You start." : "\(opponent) starts."
+                    })
+                }
             } else {
                 print("Failed to set list of players")
             }
         }
         
-        moveMade(game: gameName, table: tableName) { move in
-            if move != -1 {
-                self.gameView!.game?.receive(message: move)
-                print("move made at col \(move)")
-                self.gameView!.setNeedsDisplay()
+        moveMade(game: gameName, table: tableName) { moveResult in
+            if let move = moveResult {
+                if move != -1 {
+                    self.gameView!.game?.receive(message: move)
+                    print("move made at col \(move)")
+                    self.gameView!.setNeedsDisplay()
+                    
+                    if self.gameView!.game!.playing {
+                        if let user = Auth.auth().currentUser {
+                            let opponent = self.players!.filter{$0.0 != user.uid}[0].1
+                            isPlayersTurn(game: gameName, table: tableName) { isTurn in
+                                if isTurn {
+                                    self.eventLabel.text = "\(opponent) \(self.gameView!.game!.getMoveText(move: move)) Your turn."
+                                } else {
+                                    self.eventLabel.text = "You \(self.gameView!.game!.getMoveText(move: move)) \(opponent)'s turn."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        opponentLeft(game: gameName, table: tableName) { didLeave in
+            if didLeave && self.gameView!.game!.playing {
+                self.gameOver(result: "abandoned")
             }
         }
     }
@@ -54,12 +96,22 @@ class GameController: UIViewController, GameDelegate {
         guard let gameName = game else {return}
         guard let tableName = table  else {return}
         
-        leaveTable(game: gameName, table: tableName)
+        Ref.child(gameName).child(tableName).removeAllObservers()
+        Ref.child(gameName).child(tableName).child("Turn").removeAllObservers()
+        
+        leaveTable(game: gameName, table: tableName, keepGame: true)
+        
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+        self.navigationController?.setToolbarHidden(false, animated: true)
     }
-    
+   
     func messageSent(message: Int) {
         guard let gameName = game else {return}
         guard let tableName = table  else {return}
+        
+        if !gameView!.game!.playing {
+            return
+        }
         
         isPlayersTurn(game: gameName, table: tableName) { isTurn in
             if isTurn {
@@ -76,12 +128,36 @@ class GameController: UIViewController, GameDelegate {
         }
     }
     
-    func gameOver() {
+    func gameOver(result: String) {
         gameView!.game!.playing = false
+        
+        infoLabel.text = ""
+        
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+        self.navigationController?.setToolbarHidden(false, animated: true)
+        
+        switch result {
+        case "draw":
+            eventLabel.text = "Game Over! It's a draw!"
+        case "Player1":
+            eventLabel.text = "Game Over! \(players![0].1) wins!"
+        case "Player2":
+            eventLabel.text = "Game Over! \(players![1].1) wins!"
+        case "abandoned":
+            eventLabel.text = "Your opponent left! You win!"
+        default:
+            return
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    func shutDown() {
+        print("shutting down")
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "Lobby") as! LobbyController
+        self.present(vc, animated: true, completion: nil)
     }
     
     //Anpassa storlek och position efter andra viewelement?
@@ -90,7 +166,7 @@ class GameController: UIViewController, GameDelegate {
         let screenHeight = UIScreen.main.bounds.height
         let margin = screenWidth * 0.05
         
-        let gameView = GameDrawer(frame:(CGRect(x: margin, y: 0.15 * screenHeight, width: 0.9 * screenWidth, height: 0.5 * screenHeight)))
+        let gameView = GameDrawer(frame:(CGRect(x: margin, y: 0.25 * screenHeight, width: 0.9 * screenWidth, height: 0.45 * screenHeight)))
         gameView.backgroundColor = .white
         
         return gameView

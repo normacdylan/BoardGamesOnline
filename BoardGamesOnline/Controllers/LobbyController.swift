@@ -18,10 +18,11 @@ class LobbyController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Leave tables?
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        findAndLeaveTable()
+   //     deleteGameTrace()
         getGames() { result in
             self.gameNames = result.map{$0.value}
             for game in self.gameNames {

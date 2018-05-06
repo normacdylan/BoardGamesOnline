@@ -152,6 +152,7 @@
                     <connections>
                         <outlet property="createTableButton" destination="08J-Sx-Yds" id="h0E-M6-DMf"/>
                         <outlet property="leaveTableButton" destination="VMP-Qf-XW3" id="AK8-UE-Zqm"/>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="toGameSegue" id="4Pn-bL-bJV"/>
                     </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xck-tq-0qU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -163,20 +164,40 @@
             <objects>
                 <viewController storyboardIdentifier="Game" id="BYZ-38-t0r" customClass="GameController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Va4-24-5KP">
+                                <rect key="frame" x="16" y="492" width="343" height="111"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PkE-ph-afn">
+                                <rect key="frame" x="16" y="64" width="343" height="107"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="eventLabel" destination="PkE-ph-afn" id="2sS-bM-9vg"/>
+                        <outlet property="infoLabel" destination="Va4-24-5KP" id="gif-jf-QJa"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1049" y="781"/>
+            <point key="canvasLocation" x="2685.5999999999999" y="25.637181409295355"/>
         </scene>
         <!--Games-->
         <scene sceneID="kFv-ZU-vhK">
             <objects>
-                <collectionViewController title="Games" id="Mrn-eJ-cyq" customClass="LobbyController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
+                <collectionViewController storyboardIdentifier="Lobby" title="Games" id="Mrn-eJ-cyq" customClass="LobbyController" customModule="BoardGamesOnline" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="4Gc-SE-86M">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -188,7 +209,7 @@
                             <inset key="sectionInset" minX="20" minY="20" maxX="20" maxY="20"/>
                         </collectionViewFlowLayout>
                         <cells>
-                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="Cell" id="Cs6-I6-VSQ" customClass="LobbyCell" customModule="BoardGamesOnline" customModuleProvider="target">
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" misplaced="YES" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="Cell" id="Cs6-I6-VSQ" customClass="LobbyCell" customModule="BoardGamesOnline" customModuleProvider="target">
                                 <rect key="frame" x="20" y="20" width="160" height="180"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">

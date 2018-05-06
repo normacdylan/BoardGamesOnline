@@ -11,5 +11,5 @@ import Foundation
 protocol GameDelegate: class {
     func messageSent(message: Int)
     
-    func gameOver()
+    func gameOver(result: String)
 }

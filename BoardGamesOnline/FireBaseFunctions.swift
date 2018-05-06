@@ -96,23 +96,28 @@ func addTable(game: String) {
     let autoKey = Ref.child(game).childByAutoId()
     if let user = Auth.auth().currentUser {
         autoKey.child(user.uid).setValue(user.displayName)
-        Ref.child(user.uid).setValue(autoKey.key)
+        Ref.child(user.uid).child("Table").setValue(autoKey.key)
+        Ref.child(user.uid).child("Game").setValue(game)
         autoKey.child("LatestMove").setValue(-1)
     }
 }
 
 func joinTable(game: String, table: String) {
-    // Kolla att spel och bord finns
+    // Kolla att spel och bord finns?
     if let user = Auth.auth().currentUser {
         Ref.child(game).child(table).child(user.uid).setValue(user.displayName)
-        Ref.child(user.uid).setValue(table)
+        Ref.child(user.uid).child("Table").setValue(table)
+        Ref.child(user.uid).child("Game").setValue(game)
     }
 }
 
-func leaveTable(game: String, table: String) {
+func leaveTable(game: String, table: String, keepGame: Bool) {
     if let user = Auth.auth().currentUser {
         Ref.child(game).child(table).child(user.uid).removeValue()
-        Ref.child(user.uid).removeValue()
+        Ref.child(user.uid).child("Table").removeValue()
+        if !keepGame {
+            Ref.child(user.uid).child("Game").removeValue()
+        }
         getPlayersAtTableOnce(game: game, table: table) { result in
             if result.count == 0 {
                 Ref.child(game).child(table).removeValue()
@@ -121,15 +126,63 @@ func leaveTable(game: String, table: String) {
     }
 }
 
+func findAndLeaveTable() {
+    print("Finding and leaving table")
+    if let _ = Auth.auth().currentUser {
+        getUserGame() { gameResult in
+            guard let game = gameResult else {
+                print("No game found")
+                return
+            }
+            
+            getUserSeat() { tableResult in
+                guard let table = tableResult else {
+                    print("No table found")
+                    return
+                }
+                
+                leaveTable(game: game, table: table, keepGame: false)
+                print("Left table")
+            }
+        }
+    } else {
+        print("No user found")
+    }
+}
+
+func deleteGameTrace() {
+    if let userId = Auth.auth().currentUser?.uid {
+        getUserGame(completed: { result in
+            guard let _ = result else {return}
+            Ref.child(userId).removeValue()
+        })
+    }
+}
+
+func opponentLeft(game: String, table: String, completed: @escaping (Bool) -> ()) {
+    Ref.child(game).child(table).observe(.childRemoved, with: { snapshot in
+        var players = 0
+        for child in snapshot.children {
+            let player = child as! DataSnapshot
+            if player.key != "LatestMove" && player.key != "Turn" {
+                players += 1
+            }
+        }
+        completed(players < 2)
+    })
+}
+
 func makeMove(game: String, table: String, move: Int) {
     Ref.child(game).child(table).child("LatestMove").setValue(move)
 }
 
 // Kolla om child latestmove finns istället!
-func moveMade(game: String, table: String, completed: @escaping (Int) -> ()) {
-    Ref.child(game).child(table).child("LatestMove").observe(.value, with: { snapshot in
-        let move = snapshot.value! as! Int
-        completed(move)
+func moveMade(game: String, table: String, completed: @escaping (Int?) -> ()) {
+    Ref.child(game).child(table).child("Turn").observe(.value, with: { snapshot in
+        Ref.child(game).child(table).child("LatestMove").observeSingleEvent(of: .value, with: { snap in
+            let move = snap.value as! Int?
+            completed(move)
+        })
     })
 }
 
@@ -147,19 +200,46 @@ func isPlayersTurn(game: String, table: String, completed: @escaping (Bool) -> (
     }
 }
 
-//observe eller observesingleevent?
 func getUserSeat(completed: @escaping (String?) -> ()) {
+    if let userId = Auth.auth().currentUser?.uid {
+        Ref.observeSingleEvent(of: .value, with: { result in
+            if result.hasChild(userId) {
+                Ref.child(userId).observeSingleEvent(of: .value, with: { snap in
+                    if snap.hasChild("Table") {
+                        Ref.child(userId).child("Table").observeSingleEvent(of: .value, with: { snapshot in
+                            if let table = snapshot.value as? String {
+                                completed(table)
+                            } else {
+                                completed(nil)
+                            }
+                        })
+                    } else {
+                        completed(nil)
+                    }
+                })
+            } else {
+                completed(nil)
+            }
+        })
+    } else {
+        completed(nil)
+    }
+}
+
+func getUserGame(completed: @escaping (String?) -> ()) {
     if let userId = Auth.auth().currentUser?.uid {
         Ref.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.hasChild(userId) {
-                let tableName = snapshot.childSnapshot(forPath: userId).value as! String
-                completed(tableName)
+                let gameName = snapshot.childSnapshot(forPath: userId).childSnapshot(forPath: "Game").value as! String
+                completed(gameName)
             } else {
                 completed(nil)
             }
         })
     }
 }
+
+
 
 // TODO
 func removeViewsObservers() {
@@ -178,7 +258,7 @@ func removeViewsObservers() {
     /*
      // getUserSeat
      if let userId = Auth.auth().currentUser?.uid {
-     Ref.child(userId).removeAllObservers()
+     Ref.child(userId).child("Table").removeAllObservers()
      } */
 }
 

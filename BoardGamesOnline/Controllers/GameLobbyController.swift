@@ -32,30 +32,34 @@ class GameLobbyController: UICollectionViewController {
         guard let gameName = game else {return}
         getPlayersAtTable(game: gameName, table: table) { result in
             if result.count > 1 {
-                let vc = self.storyboard?.instantiateViewController(withIdentifier: "Game") as! GameController
-                vc.game = self.game
-                vc.table = table
+                Ref.child(gameName).child(table).removeAllObservers()
                 self.goingToGame = true
-                self.present(vc, animated: true, completion: nil)
+                self.performSegue(withIdentifier: "toGameSegue", sender: nil)
             }
         }
     }
     
     func setupView() {
-        if let name = game {
-            title = name
-            
-            getTables(game: name) { result in
-                self.tables = result
-                self.collectionView?.reloadData()
+        getUserGame() { result in
+            if let game = result {
+                self.game = game
             }
+        
+            if let name = self.game {
+                self.title = name
             
-            getUserSeat() { seat in
-                self.createTableButton.isEnabled = seat == nil
-                self.leaveTableButton.isEnabled = seat != nil
+                getUserSeat() { seat in
+                    self.createTableButton.isEnabled = seat == nil
+                    self.leaveTableButton.isEnabled = seat != nil
+                }
+                
+                getTables(game: name) { result in
+                    self.tables = result
+                    self.collectionView?.reloadData()
+                }
+            } else {
+                self.title = "Unable To Load Contents"
             }
-        } else {
-            title = "Unable To Load Contents"
         }
     }
     
@@ -65,12 +69,11 @@ class GameLobbyController: UICollectionViewController {
                 guard let name = self.game else {return}
                 guard let seat = result else {return}
                 
-                leaveTable(game: name, table: seat)
+                leaveTable(game: name, table: seat, keepGame: false)
             }
         }
-    //    removeViewsObservers()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -80,27 +83,32 @@ class GameLobbyController: UICollectionViewController {
             guard let name = self.game else {return}
             guard let seat = result else {return}
             
-            leaveTable(game: name, table: seat)
+            leaveTable(game: name, table: seat, keepGame: false)
             self.setupView()
         }
     }
     
     @IBAction func pressedCreateTable(_ sender: Any) {
+        print("Creating table")
         getUserSeat() {result in
             if result == nil {
                 addTable(game: self.game!)
                 self.setupView()
                 getUserSeat() { seat in
-                    print("seat")
-                    self.checkIfTableIsFull(table: seat!)
+                    if let table = seat {
+                        self.checkIfTableIsFull(table: table)
+                    } else {
+                        print("no table found")
+                    }
                 }
             }
         }
     }
     
     @IBAction func pressedLogOut(_ sender: Any) {
-        viewDidDisappear(false)
+        viewDidDisappear(true)
         
+        findAndLeaveTable()
         try! Auth.auth().signOut()
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "Login") as! LoginController
         self.present(vc, animated: true, completion: nil)
@@ -117,11 +125,8 @@ class GameLobbyController: UICollectionViewController {
                     joinTable(game: name, table: tableKey)
                     self.setupView()
                     
-                    let vc = self.storyboard?.instantiateViewController(withIdentifier: "Game") as! GameController
-                    vc.game = self.game
-                    vc.table = tableKey
                     self.goingToGame = true
-                    self.present(vc, animated: true, completion: nil)
+                    self.performSegue(withIdentifier: "toGameSegue", sender: nil)
                 }
             }
         }
@@ -150,9 +155,21 @@ class GameLobbyController: UICollectionViewController {
             cell.player2Label.text = "Empty Seat"
         }
         
-        cell.tableImage.image = UIImage.init(named: "Table")
+        cell.tableImage.image = tables[indexPath.row].1.count < 2 ? UIImage.init(named: "Table") : UIImage.init(named: "FullTable")
         
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let gameName = game else {return}
+        
+        getUserSeat() { result in
+            if let seat = result {
+                let destination = segue.destination as! GameController
+                destination.game = gameName
+                destination.table = seat
+            }
+        }
     }
 
     // MARK: UICollectionViewDelegate

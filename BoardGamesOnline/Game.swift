@@ -17,6 +17,12 @@ protocol Game {
         
     func draw(_ rect: CGRect)
     
+    func getEventText() -> String
+    
+    func getInfoText() -> String
+    
+    func getMoveText(move: Int) -> String
+    
     func onTouch(x: Double, y: Double)
     
     func send(message: Int)

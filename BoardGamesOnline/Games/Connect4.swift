@@ -70,7 +70,7 @@ class Board {
     }
     
     func isFull() -> Bool {
-        return board[0].filter{$0 == nil}.count > 0
+        return board[0].filter{$0 == nil}.count == 0
       //  return board[0].contains(nil)
     }
     
@@ -216,7 +216,19 @@ class Connect4Game: Game {
         }
     }
     
-    // send column istället?
+    func getEventText() -> String {
+        return ""
+    }
+    
+    func getInfoText() -> String {
+        return "First to get four coins in a row wins. Tap above a column to drop coin."
+    }
+    
+    func getMoveText(move: Int) -> String {
+        let countNames = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh"]
+        return "dropped a coin in the \(countNames[move]) column."
+    }
+    
     func send(message: Int) {
         delegate?.messageSent(message: message)
     }
@@ -227,20 +239,19 @@ class Connect4Game: Game {
             if board.placeCoin(column: message, player: turn) {
                 print("coin placed at column: \(message)")
                 turn = players.filter{$0 != turn}[0]
+                if let winner = board.getWinner() {
+                    print("game over")
+                    delegate?.gameOver(result: "\(winner.player)")
+                } else if board.isFull() {
+                    print("game over")
+                    delegate?.gameOver(result: "draw")
+                }
             }
         }
     }
     
     func isOver() {
-        if let _ = board.getWinner() {
-            delegate?.gameOver()
-            return
-        }
         
-        if board.isFull() {
-            delegate?.gameOver()
-            return
-        }
     }
     
     // Flera olika typer av touch för att flytta och släppa mynt. UITouchGesture?
@@ -250,7 +261,6 @@ class Connect4Game: Game {
              //   print("column \(col), x-value: \(getCoinCoordinates(0,col).x)")
                 if abs(x - getCoinCoordinates(0, col).x) < coinRadius {
                     if board.canPlaceCoin(column: col) {
-                     //   turn = players.filter{$0 != turn}[0]
                         send(message: col)
                     }
                 }

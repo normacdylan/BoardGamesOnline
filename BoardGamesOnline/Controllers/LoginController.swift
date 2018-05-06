@@ -38,7 +38,7 @@ class LoginController: UIViewController, UITextFieldDelegate {
             passwordEdit.text = (password as! String)
         }
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -69,6 +69,7 @@ class LoginController: UIViewController, UITextFieldDelegate {
     @IBAction func pressedSegment(_ sender: Any) {
         button.titleLabel?.text = segmentControl.selectedSegmentIndex == 0 ? "Register" : "Log In"
         usernameEdit.isHidden = segmentControl.selectedSegmentIndex == 1
+        
     }
     
     func handleSignUp() {
@@ -85,6 +86,10 @@ class LoginController: UIViewController, UITextFieldDelegate {
                 changeRequest?.commitChanges() { error in
                     if error == nil {
                         print("Username added")
+                    } else {
+                        let alert = UIAlertController(title: "Could not choose username", message: error!.localizedDescription , preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Got it", style: .cancel, handler: nil))
+                        self.present(alert, animated: true)
                     }
                 }
                 
@@ -93,6 +98,9 @@ class LoginController: UIViewController, UITextFieldDelegate {
                 
             } else {
                 print("Error creating user: \(error!.localizedDescription)")
+                let alert = UIAlertController(title: "Could not register", message: error!.localizedDescription , preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Got it", style: .cancel, handler: nil))
+                self.present(alert, animated: true)
             }
         }
     }
@@ -108,6 +116,9 @@ class LoginController: UIViewController, UITextFieldDelegate {
                 self.performSegue(withIdentifier: "loginToLobbySegue", sender: self)
             } else {
                 print("Error when logging in: \(error!.localizedDescription)")
+                let alert = UIAlertController(title: "Could not log in", message: error!.localizedDescription , preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Got it", style: .cancel, handler: nil))
+                self.present(alert, animated: true)
             }
         }
     }
