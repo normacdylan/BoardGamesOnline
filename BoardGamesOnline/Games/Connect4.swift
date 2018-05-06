@@ -215,11 +215,7 @@ class Connect4Game: Game {
             linePath.stroke()
         }
     }
-    
-    func getEventText() -> String {
-        return ""
-    }
-    
+ 
     func getInfoText() -> String {
         return "First to get four coins in a row wins. Tap above a column to drop coin."
     }
@@ -233,7 +229,6 @@ class Connect4Game: Game {
         delegate?.messageSent(message: message)
     }
     
-    // Lägg mynt i column om möjligt
     func receive(message: Int) {
         if board.canPlaceCoin(column: message) {
             if board.placeCoin(column: message, player: turn) {
@@ -249,16 +244,10 @@ class Connect4Game: Game {
             }
         }
     }
-    
-    func isOver() {
-        
-    }
-    
-    // Flera olika typer av touch för att flytta och släppa mynt. UITouchGesture?
+
     func onTouch(x: Double, y: Double) {
         if y < topMargin {
             for col in 0..<board.columns {
-             //   print("column \(col), x-value: \(getCoinCoordinates(0,col).x)")
                 if abs(x - getCoinCoordinates(0, col).x) < coinRadius {
                     if board.canPlaceCoin(column: col) {
                         send(message: col)

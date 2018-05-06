@@ -34,21 +34,16 @@ class GameDrawer: UIView {
         }
     }
     
-    // byta ut mot uitouch istället?
     private func addGestureRecognizers() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.touch(_:)))
         self.addGestureRecognizer(tapGesture)
         
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(self.touch(_:)))
         self.addGestureRecognizer(swipeGesture)
-        
-        // Longpress?
     }
     
     @objc func touch(_ sender: UIGestureRecognizer) {
         let point = sender.location(in: self)
-     //   print("tapped x:\(point.x) y:\(point.y)")
-        // lägg till sender som argument i ontouch
         game!.onTouch(x: Double(point.x), y: Double(point.y))
         setNeedsDisplay()
     }

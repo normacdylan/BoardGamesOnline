@@ -176,7 +176,6 @@ func makeMove(game: String, table: String, move: Int) {
     Ref.child(game).child(table).child("LatestMove").setValue(move)
 }
 
-// Kolla om child latestmove finns istället!
 func moveMade(game: String, table: String, completed: @escaping (Int?) -> ()) {
     Ref.child(game).child(table).child("Turn").observe(.value, with: { snapshot in
         Ref.child(game).child(table).child("LatestMove").observeSingleEvent(of: .value, with: { snap in
@@ -239,37 +238,4 @@ func getUserGame(completed: @escaping (String?) -> ()) {
     }
 }
 
-
-
-// TODO
-func removeViewsObservers() {
-    // getGames
-    Games.removeAllObservers()
-    
-    // amountOfPlayers, getTables, getPlayersAtTable
-    Games.observeSingleEvent(of: .value, with: { snapshot in
-        for child in snapshot.children {
-            let game = child as! DataSnapshot
-            let path = game.value! as! String
-            Ref.child(path).removeAllObservers()
-            removeChildrensObservers(parent: Ref.child(path))
-        }
-    })
-    /*
-     // getUserSeat
-     if let userId = Auth.auth().currentUser?.uid {
-     Ref.child(userId).child("Table").removeAllObservers()
-     } */
-}
-
-func removeChildrensObservers(parent: DatabaseReference) {
-    parent.observeSingleEvent(of: .value, with: { snapshot in
-        for child in snapshot.children {
-            let path = child as! DataSnapshot
-            parent.child(path.key).removeAllObservers()
-        }
-    })
-}
-
-// funktion som hämtar alla users och vilka bord de sitter på?
 

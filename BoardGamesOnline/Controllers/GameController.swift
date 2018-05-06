@@ -160,7 +160,6 @@ class GameController: UIViewController, GameDelegate {
         self.present(vc, animated: true, completion: nil)
     }
     
-    //Anpassa storlek och position efter andra viewelement?
     func getGameView() -> GameDrawer {
         let screenWidth = UIScreen.main.bounds.width
         let screenHeight = UIScreen.main.bounds.height

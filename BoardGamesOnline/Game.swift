@@ -16,9 +16,7 @@ protocol Game {
     var delegate: GameDelegate? {get set}
         
     func draw(_ rect: CGRect)
-    
-    func getEventText() -> String
-    
+
     func getInfoText() -> String
     
     func getMoveText(move: Int) -> String
@@ -26,10 +24,6 @@ protocol Game {
     func onTouch(x: Double, y: Double)
     
     func send(message: Int)
-    
-    func isOver()
-    
+
     func receive(message: Int)
-    
-    //func onTouch(x: Double, y: Double, gesture: UIGestureRecognizer)
 }
