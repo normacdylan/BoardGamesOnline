@@ -92,6 +92,7 @@ class GameController: UIViewController, GameDelegate {
         opponentLeft(game: gameName, table: tableName) { didLeave in
             if didLeave && self.gameView!.game!.playing {
                 self.gameOver(result: "abandoned")
+                Ref.child(gameName).child(tableName).child("Turn").removeAllObservers()
             }
         }
     }
