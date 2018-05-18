@@ -160,8 +160,20 @@ class GameController: UIViewController, GameDelegate {
                 }
             }
         case "abandoned":
+            guard let gameName = game else {
+                eventLabel.text = "Too few players. Game over."
+                return
+            }
+            guard let tableName = table else {
+                eventLabel.text = "Too few players. Game over."
+                return
+            }
             
-            eventLabel.text = "Your opponent left! You win!"
+            getPlayersAtTableOnce(game: gameName, table: tableName) { result in
+                if let userId = Auth.auth().currentUser?.uid {
+                    self.eventLabel.text = result[0].0 == userId ? "Your opponent left! You win!" : "You left the game! Your opponent won!"
+                }
+            }
         default:
             return
         }
