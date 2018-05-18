@@ -32,9 +32,9 @@ class GameLobbyController: UICollectionViewController {
         guard let gameName = game else {return}
         getPlayersAtTable(game: gameName, table: table) { result in
             if result.count > 1 {
-                Ref.child(gameName).child(table).removeAllObservers()
                 self.goingToGame = true
                 self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+                Ref.child(gameName).child(table).removeAllObservers()
             }
         }
     }
@@ -166,7 +166,9 @@ class GameLobbyController: UICollectionViewController {
         getUserSeat() { result in
             if let seat = result {
                 let destination = segue.destination as! GameController
+                print("is the gamecontroller loaded?")
                 destination.game = gameName
+                print("Destination: \(segue.identifier!), destination.game = \(destination.game!)")
                 destination.table = seat
             }
         }

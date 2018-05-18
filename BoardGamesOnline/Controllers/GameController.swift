@@ -20,23 +20,28 @@ class GameController: UIViewController, GameDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("game did load")
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        print("game did appear")
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         self.navigationController?.setToolbarHidden(true, animated: true)
         
         gameView = getGameView()
         self.view.addSubview(gameView!)
         
+        print("about to check for games")
+        
         guard let gameName = game else {
             print("no game found")
-            shutDown()
+        //    shutDown()
             return
         }
+    
         guard let tableName = table  else {
             print("no table found")
-            shutDown()
+         //   shutDown()
             return
         }
         
@@ -49,7 +54,6 @@ class GameController: UIViewController, GameDelegate {
             self.players = result
             if let playerList = self.players {
                 setPlayerTurn(game: gameName, table: tableName, playerId: playerList[0].0)
-                print("initiated turn")
                 self.gameView!.startGame()
                 if let user = Auth.auth().currentUser {
                     let opponent = playerList.filter{$0.0 != user.uid}[0].1
@@ -140,10 +144,23 @@ class GameController: UIViewController, GameDelegate {
         case "draw":
             eventLabel.text = "Game Over! It's a draw!"
         case "Player1":
-            eventLabel.text = "Game Over! \(players![0].1) wins!"
+            if let userId = Auth.auth().currentUser?.uid {
+                if userId == players![0].1 {
+                    self.eventLabel.text = "Game Over! You win!"
+                } else {
+                    self.eventLabel.text = "Game Over! \(players![0].1) wins!"
+                }
+            }
         case "Player2":
-            eventLabel.text = "Game Over! \(players![1].1) wins!"
+            if let userId = Auth.auth().currentUser?.uid {
+                if userId == players![1].1 {
+                    self.eventLabel.text = "Game Over! You win!"
+                } else {
+                    self.eventLabel.text = "Game Over! \(players![1].1) wins!"
+                }
+            }
         case "abandoned":
+            
             eventLabel.text = "Your opponent left! You win!"
         default:
             return

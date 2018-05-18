@@ -51,6 +51,7 @@ class LobbyController: UICollectionViewController {
         let cell = sender as! LobbyCell
         let destination = segue.destination as! GameLobbyController
         destination.game = cell.label.text
+        print("Destination: \(segue.identifier!), destination.game = \(destination.game!)")
     }
     
 

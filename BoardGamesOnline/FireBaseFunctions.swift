@@ -141,7 +141,8 @@ func findAndLeaveTable() {
                     return
                 }
                 
-                leaveTable(game: game, table: table, keepGame: false)
+                // KeepGame: false?
+                leaveTable(game: game, table: table, keepGame: true)
                 print("Left table")
             }
         }
