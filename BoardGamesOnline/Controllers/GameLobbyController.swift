@@ -33,7 +33,10 @@ class GameLobbyController: UICollectionViewController {
         getPlayersAtTable(game: gameName, table: table) { result in
             if result.count > 1 {
                 self.goingToGame = true
-                self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+            //    self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+                DispatchQueue.main.async {
+                    self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+                }
                 Ref.child(gameName).child(table).removeAllObservers()
             }
         }
@@ -126,7 +129,10 @@ class GameLobbyController: UICollectionViewController {
                     self.setupView()
                     
                     self.goingToGame = true
-                    self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+              //      self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+                    DispatchQueue.main.async {
+                        self.performSegue(withIdentifier: "toGameSegue", sender: nil)
+                    }
                 }
             }
         }
@@ -161,7 +167,10 @@ class GameLobbyController: UICollectionViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let gameName = game else {return}
+        guard let gameName = game else {
+            print("Did not finish prepare for segue to GameController")
+            return
+        }
         
         getUserSeat() { result in
             if let seat = result {
@@ -170,6 +179,7 @@ class GameLobbyController: UICollectionViewController {
                 destination.game = gameName
                 print("Destination: \(segue.identifier!), destination.game = \(destination.game!)")
                 destination.table = seat
+                print("Destination: \(segue.identifier!), destination.table = \(destination.table!)")
             }
         }
     }
